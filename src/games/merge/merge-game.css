@@ -1,0 +1,367 @@
+/* ==========================================
+   Genesis Merge 専用スタイル
+   ========================================== */
+
+.merge-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+.merge-controls {
+    display: flex;
+    justify-content: flex-end;
+    width: 300px;
+}
+
+/* ボードスタイル */
+.grid-board {
+    width: 300px;
+    height: 300px;
+    background-color: var(--bg-board);
+    border-radius: 20px;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 8px;
+    position: relative;
+    user-select: none;
+    box-shadow: 
+        inset 0 4px 8px rgba(0, 0, 0, 0.04),
+        0 8px 20px rgba(0, 0, 0, 0.01);
+}
+
+.grid-cell { 
+    width: 100%; 
+    height: 100%; 
+    background-color: var(--bg-tile-empty); 
+    border-radius: 12px; 
+}
+
+/* ==========================================
+   タイルの基本レイアウト
+   ========================================== */
+.tile {
+    width: var(--tile-size, 64px);
+    height: var(--tile-size, 64px);
+    border-radius: 12px;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 4px;
+    box-shadow: var(--shadow-tile);
+    z-index: 10;
+    transition: transform 0.13s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, opacity 0.13s ease;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    user-select: none;
+}
+
+.tile-to-delete {
+    z-index: 5 !important;
+    opacity: 0.55 !important;
+}
+
+.tile-number { position: absolute; top: 4px; left: 6px; font-size: 7.5px; font-weight: 700; opacity: 0.45; }
+.tile-icon { font-size: 20px; margin-top: 3px; }
+.tile-label { font-size: 7.5px; font-weight: 700; letter-spacing: 0.1px; margin-top: 2px; text-transform: uppercase; opacity: 0.9; }
+
+/* A. 数字スキンの設定 */
+.theme-numbers .tile-icon, 
+.theme-numbers .tile-label {
+    display: none;
+}
+.theme-numbers .tile-number {
+    position: static;
+    font-size: 22px;
+    font-weight: 800;
+    opacity: 1;
+}
+
+/* アニメーション */
+.tile-new {
+    animation: popIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.tile-merged {
+    z-index: 12 !important;
+    animation: mergePulse 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes popIn {
+    0% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
+    100% { transform: translate(var(--x), var(--y)) scale(1); opacity: 1; }
+}
+
+@keyframes mergePulse {
+    0% { transform: translate(var(--x), var(--y)) scale(1); }
+    50% { transform: translate(var(--x), var(--y)) scale(1.16); }
+    100% { transform: translate(var(--x), var(--y)) scale(1); }
+}
+
+/* スコアポップアップ */
+.board-score-popup {
+    position: absolute;
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 800;
+    z-index: 100;
+    pointer-events: none;
+    animation: scoreFloatUp 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes scoreFloatUp {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-36px); opacity: 0; }
+}
+
+.undo-btn {
+    border: 1px solid var(--border-color);
+    background-color: rgba(250, 249, 246, 0.6);
+    padding: 5px 8px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    color: var(--accent);
+    font-family: inherit;
+    font-size: 9px;
+    font-weight: 700;
+    transition: all 0.2s;
+}
+.undo-btn.disabled { opacity: 0.35; cursor: not-allowed; color: var(--text-light); }
+.undo-btn:hover:not(.disabled) {
+    background-color: var(--accent);
+    color: white;
+}
+
+/* 赤いRESETボタン */
+#reset-btn {
+    background-color: #E53935 !important;
+    color: white !important;
+    border-color: #E53935 !important;
+    font-weight: 800 !important;
+    box-shadow: 0 2px 8px rgba(229, 57, 53, 0.25);
+}
+#reset-btn:hover {
+    background-color: #C62828 !important;
+    border-color: #C62828 !important;
+}
+
+/* 進化の過程の折り返し対応（スクロールバーの排除） */
+.evolution-indicator {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px 2px;
+    padding: 4px 8px;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto 8px auto;
+    overflow: hidden !important; /* スクロールバーの完全な非表示 */
+}
+.evolution-indicator::-webkit-scrollbar {
+    display: none !important; /* Safari / Chrome用スクロールバー非表示 */
+}
+
+/* ==========================================
+   円形スキルツリー（SFネオンエフェクト）
+   ========================================== */
+.circular-tree-board {
+    box-shadow: 0 0 25px rgba(255,255,255,0.01), inset 0 0 20px rgba(0,0,0,0.4);
+}
+
+.tree-node {
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    border: 2px solid rgba(255,255,255,0.15);
+    background: #2C3E50;
+    color: #BDC3C7;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* ホバー時に軽く浮き上がる */
+.tree-node:hover {
+    transform: scale(1.1) !important;
+    border-color: var(--accent) !important;
+}
+
+/* 選択されたノードのパルスハイライト */
+.tree-node.selected-node {
+    transform: scale(1.15) !important;
+    animation: selectedPulse 1.8s infinite ease-in-out;
+    border: 2.5px solid #FFF !important;
+    z-index: 20 !important;
+}
+
+@keyframes selectedPulse {
+    0% { box-shadow: 0 0 0 0px rgba(226, 125, 96, 0.6); }
+    70% { box-shadow: 0 0 0 12px rgba(226, 125, 96, 0); }
+    100% { box-shadow: 0 0 0 0px rgba(226, 125, 96, 0); }
+}
+
+/* アクティブなSVG接続線の点滅アニメーション */
+line[stroke="var(--accent)"] {
+    animation: lineFlow 2s infinite linear;
+}
+
+@keyframes lineFlow {
+    from { stroke-dashoffset: 20; }
+    to { stroke-dashoffset: 0; }
+}
+
+/* ==========================================
+   各スキンのカラー・配色定義
+   ========================================== */
+/* 1. クラシック・ナンバーのスタイル */
+.tile-2 { background-color: #ECEFF1; color: #37474F; }
+.tile-4 { background-color: #CFD8DC; color: #37474F; }
+.tile-8 { background-color: #FFE082; color: #FF8F00; }
+.tile-16 { background-color: #FFCC80; color: #EF6C00; }
+.tile-32 { background-color: #FFAB91; color: #D84315; }
+.tile-64 { background-color: #FF8A80; color: #C62828; }
+.tile-128 { background-color: #80CBC4; color: #00695C; box-shadow: 0 0 12px rgba(128, 203, 196, 0.5); }
+.tile-256 { background-color: #4DB6AC; color: white; }
+.tile-512 { background-color: #26A69A; color: white; }
+.tile-1024 { background-color: #80DEEA; color: #00838F; }
+.tile-2048 { background-color: #4DD0E1; color: white; }
+.tile-4096 { background-color: #9FA8DA; color: #283593; }
+.tile-8192 { background-color: #7986CB; color: white; }
+.tile-16384 { background-color: #B39DDB; color: #4527A0; }
+.tile-32768 { background-color: #EF9A9A; color: #B71C1C; }
+.tile-65536 { background-color: #B0BEC5; color: #263238; }
+
+/* 2. 宇宙進化スキンの配色 */
+.theme-celestial .tile-2 { background-color: #EAF0EC; color: #5D7268; }
+.theme-celestial .tile-4 { background-color: #ECECEB; color: #6E716F; }
+.theme-celestial .tile-8 { background-color: #EAE2D8; color: #8C7C6D; }
+.theme-celestial .tile-16 { background-color: #FCF8E3; color: #8A7B42; }
+.theme-celestial .tile-32 { background-color: #FAF0EC; color: #B27065; }
+.theme-celestial .tile-64 { background-color: #FCEAE6; color: #B56B5C; }
+.theme-celestial .tile-128 { background-color: #E3F2FD; color: #4A85A3; box-shadow: 0 0 12px rgba(227, 242, 253, 0.6); }
+.theme-celestial .tile-256 { background-color: #FAF0EC; color: #B27065; }
+.theme-celestial .tile-512 { background-color: #F5EEF8; color: #9C6AA6; }
+.theme-celestial .tile-1024 { background-color: #FBEFE3; color: #A37953; }
+.theme-celestial .tile-2048 { background-color: #E0F7FA; color: #3B929E; }
+.theme-celestial .tile-4096 { background-color: #E8EAF6; color: #5C6BC0; }
+.theme-celestial .tile-8192 { background-color: #ECEFF1; color: #455A64; }
+.theme-celestial .tile-16384 { background-color: #FFF9C4; color: #F57F17; }
+.theme-celestial .tile-32768 { background-color: #FFCC80; color: #E65100; }
+.theme-celestial .tile-65536 { background-color: #CFD8DC; color: #263238; }
+
+/* 3. 宝石スキンの配色 */
+.theme-gems .tile-2 { background-color: #FAFAFA; color: #757575; }
+.theme-gems .tile-4 { background-color: #F3E5F5; color: #7B1FA2; }
+.theme-gems .tile-8 { background-color: #E0F7FA; color: #0097A7; }
+.theme-gems .tile-16 { background-color: #FFF9C4; color: #FBC02D; }
+.theme-gems .tile-32 { background-color: #E8F5E9; color: #2E7D32; }
+.theme-gems .tile-64 { background-color: #FFF3E0; color: #EF6C00; }
+.theme-gems .tile-128 { background-color: #E1F5FE; color: #0288D1; box-shadow: 0 0 12px rgba(2, 136, 209, 0.5); }
+.theme-gems .tile-256 { background-color: #FCE4EC; color: #C2185B; }
+.theme-gems .tile-512 { background-color: #E0F2F1; color: #00796B; }
+.theme-gems .tile-1024 { background-color: #FFEBEE; color: #D32F2F; }
+.theme-gems .tile-2048 { background-color: #F3E5F5; color: #8E24AA; }
+.theme-gems .tile-4096 { background-color: #E0F7FA; color: #006064; }
+.theme-gems .tile-8192 { background-color: #FCE4EC; color: #880E4F; }
+.theme-gems .tile-16384 { background-color: #FFF8E1; color: #FF6F00; }
+.theme-gems .tile-32768 { background-color: #EDE7F6; color: #311B92; }
+.theme-gems .tile-65536 { background-color: #E1F5FE; color: #01579B; }
+
+/* 4. 大数スキンの配色 (和風・ゴールド・アース系) */
+.theme-kanji_large .tile { background-color: #F4EBE1; color: #7D6B58; }
+.theme-kanji_large .tile-2 { background-color: #F5EBE6; color: #8C6B61; }
+.theme-kanji_large .tile-4 { background-color: #FAF5E6; color: #8A7A5D; }
+.theme-kanji_large .tile-8 { background-color: #F5FAF6; color: #618C6F; }
+.theme-kanji_large .tile-16 { background-color: #EBF7FA; color: #518596; }
+.theme-kanji_large .tile-32 { background-color: #EBEBF5; color: #5B5B8A; }
+.theme-kanji_large .tile-64 { background-color: #F2EBF5; color: #7B5B8A; }
+.theme-kanji_large .tile-128 { background-color: #FAF0E6; color: #8A6D3D; box-shadow: 0 0 12px rgba(138, 109, 61, 0.4); }
+.theme-kanji_large .tile-256 { background-color: #E8F5E9; color: #2E7D32; }
+.theme-kanji_large .tile-512 { background-color: #E1F5FE; color: #0288D1; }
+.theme-kanji_large .tile-1024 { background-color: #FFF8E1; color: #F57F17; }
+.theme-kanji_large .tile-2048 { background-color: #FFF3E0; color: #E65100; }
+.theme-kanji_large .tile-4096 { background-color: #FFE082; color: #FF8F00; }
+.theme-kanji_large .tile-8192 { background-color: #FFCDD2; color: #C62828; }
+.theme-kanji_large .tile-16384 { background-color: #E1BEE7; color: #6A1B9A; }
+.theme-kanji_large .tile-32768 { background-color: #C5CAE9; color: #283593; }
+.theme-kanji_large .tile-65536 { background-color: #B2DFDB; color: #00695C; }
+
+/* 5. 小数スキンの配色 (和風・淡色・水色系) */
+.theme-kanji_small .tile { background-color: #EBF5F5; color: #5F7D7D; }
+.theme-kanji_small .tile-2 { background-color: #E3F2FD; color: #1565C0; }
+.theme-kanji_small .tile-4 { background-color: #E0F2F1; color: #00695C; }
+.theme-kanji_small .tile-8 { background-color: #E8F5E9; color: #2E7D32; }
+.theme-kanji_small .tile-16 { background-color: #F1F8E9; color: #33691E; }
+.theme-kanji_small .tile-32 { background-color: #FFFDE7; color: #F57F17; }
+.theme-kanji_small .tile-64 { background-color: #FFF8E1; color: #FF6F00; }
+.theme-kanji_small .tile-128 { background-color: #FFF3E0; color: #E65100; box-shadow: 0 0 12px rgba(230, 81, 0, 0.4); }
+.theme-kanji_small .tile-256 { background-color: #FFE082; color: #FF8F00; }
+.theme-kanji_small .tile-512 { background-color: #FFCDD2; color: #C62828; }
+.theme-kanji_small .tile-1024 { background-color: #F8BBD0; color: #C2185B; }
+.theme-kanji_small .tile-2048 { background-color: #E1BEE7; color: #6A1B9A; }
+.theme-kanji_small .tile-4096 { background-color: #D1C4E9; color: #311B92; }
+.theme-kanji_small .tile-8192 { background-color: #C5CAE9; color: #283593; }
+.theme-kanji_small .tile-16384 { background-color: #B3E5FC; color: #0277BD; }
+.theme-kanji_small .tile-32768 { background-color: #B2EBF2; color: #00838F; }
+.theme-kanji_small .tile-65536 { background-color: #B2DFDB; color: #00695C; }
+
+/* 6. SI接頭辞スキンの配色 (サイバー・ネオン系) */
+.theme-si_prefix .tile { background-color: #EAEBF5; color: #5B5E8A; }
+.theme-si_prefix .tile-2 { background-color: #ECEFF1; color: #455A64; }
+.theme-si_prefix .tile-4 { background-color: #CFD8DC; color: #37474F; }
+.theme-si_prefix .tile-8 { background-color: #90CAF9; color: #0D47A1; }
+.theme-si_prefix .tile-16 { background-color: #64B5F6; color: white; }
+.theme-si_prefix .tile-32 { background-color: #42A5F5; color: white; }
+.theme-si_prefix .tile-64 { background-color: #2196F3; color: white; }
+.theme-si_prefix .tile-128 { background-color: #1E88E5; color: white; box-shadow: 0 0 12px rgba(30, 136, 229, 0.5); }
+.theme-si_prefix .tile-256 { background-color: #1565C0; color: white; }
+.theme-si_prefix .tile-512 { background-color: #0D47A1; color: white; }
+.theme-si_prefix .tile-1024 { background-color: #B39DDB; color: #4527A0; }
+.theme-si_prefix .tile-2048 { background-color: #9575CD; color: white; }
+.theme-si_prefix .tile-4096 { background-color: #7986CB; color: white; }
+.theme-si_prefix .tile-8192 { background-color: #5C6BC0; color: white; }
+.theme-si_prefix .tile-16384 { background-color: #3F51B5; color: white; }
+.theme-si_prefix .tile-32768 { background-color: #283593; color: white; }
+.theme-si_prefix .tile-65536 { background-color: #1A237E; color: white; }
+
+/* 7. 元素記号スキンの配色 (サイエンス・カラフル系) */
+.theme-element .tile { background-color: #F0F4C3; color: #827717; }
+.theme-element .tile-2 { background-color: #FFF9C4; color: #F57F17; }
+.theme-element .tile-4 { background-color: #FFE082; color: #FF8F00; }
+.theme-element .tile-8 { background-color: #FFCC80; color: #E65100; }
+.theme-element .tile-16 { background-color: #FFAB91; color: #D84315; }
+.theme-element .tile-32 { background-color: #FF8A80; color: #C62828; }
+.theme-element .tile-64 { background-color: #FF5252; color: white; }
+.theme-element .tile-128 { background-color: #FF1744; color: white; box-shadow: 0 0 12px rgba(255, 23, 68, 0.5); }
+.theme-element .tile-256 { background-color: #E040FB; color: white; }
+.theme-element .tile-512 { background-color: #D500F9; color: white; }
+.theme-element .tile-1024 { background-color: #651FFF; color: white; }
+.theme-element .tile-2048 { background-color: #3D5AFE; color: white; }
+.theme-element .tile-4096 { background-color: #2979FF; color: white; }
+.theme-element .tile-8192 { background-color: #00E5FF; color: #006064; }
+.theme-element .tile-16384 { background-color: #1DE9B6; color: #004D40; }
+.theme-element .tile-32768 { background-color: #00E676; color: #1B5E20; }
+.theme-element .tile-65536 { background-color: #76FF03; color: #33691E; }
+
+/* 8. ギルドランクスキンの配色 (ファンタジー・ゴールド・メタル系) */
+.theme-guild .tile { background-color: #E0E0E0; color: #616161; }
+.theme-guild .tile-2 { background-color: #D7CCC8; color: #5D4037; }
+.theme-guild .tile-4 { background-color: #FFE082; color: #FF8F00; }
+.theme-guild .tile-8 { background-color: #FFD54F; color: #F57F17; }
+.theme-guild .tile-16 { background-color: #FFCA28; color: #E65100; }
+.theme-guild .tile-32 { background-color: #FFB300; color: white; }
+.theme-guild .tile-64 { background-color: #FFA000; color: white; }
+.theme-guild .tile-128 { background-color: #FF8F00; color: white; box-shadow: 0 0 12px rgba(255, 143, 0, 0.5); }
+.theme-guild .tile-256 { background-color: #FF6F00; color: white; }
+.theme-guild .tile-512 { background-color: #E65100; color: white; }
+.theme-guild .tile-1024 { background-color: #D84315; color: white; }
+.theme-guild .tile-2048 { background-color: #BF360C; color: white; }
+.theme-guild .tile-4096 { background-color: #8E24AA; color: white; }
+.theme-guild .tile-8192 { background-color: #7B1FA2; color: white; }
+.theme-guild .tile-16384 { background-color: #6A1B9A; color: white; }
+.theme-guild .tile-32768 { background-color: #4A148C; color: white; }
+.theme-guild .tile-65536 { background-color: #311B92; color: white; }

@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <script>
+        window.onerror = function(message, source, lineno, colno, error) {
+            // エラーを引き起こした可能性のあるアクティブ要素（ボタンなど）を特定
+            const activeEl = document.activeElement;
+            let actionText = "不明な操作（またはロード時の自動実行）";
+            if (activeEl && activeEl !== document.body && activeEl !== document.documentElement) {
+                actionText = `<${activeEl.tagName.toLowerCase()}`;
+                if (activeEl.id) actionText += ` id="${activeEl.id}"`;
+                if (activeEl.className) actionText += ` class="${activeEl.className}"`;
+                if (activeEl.getAttribute('onclick')) actionText += ` onclick="${activeEl.getAttribute('onclick')}"`;
+                actionText += `>`;
+                if (activeEl.innerText) {
+                    actionText += `\nボタン内のテキスト: "${activeEl.innerText.trim().substring(0, 40)}"`;
+                }
+            }
+
+            const errText = `[JS ERROR]\n【実行しようとした操作】\n${actionText}\n\n【エラー内容】\nMessage: ${message}\nSource: ${source}\nLine: ${lineno}:${colno}\nStack: ${error ? error.stack : 'N/A'}`;
+            console.error(errText);
+            
+            // 緊急アラート
+            alert(errText);
+
+            const div = document.createElement('div');
+            div.style.position = 'fixed';
+            div.style.top = '0';
+            div.style.left = '0';
+            div.style.width = '100%';
+            div.style.backgroundColor = '#FF5252';
+            div.style.color = 'white';
+            div.style.padding = '15px';
+            div.style.zIndex = '999999';
+            div.style.fontSize = '12px';
+            div.style.fontFamily = 'monospace';
+            div.style.whiteSpace = 'pre-wrap';
+            div.style.boxSizing = 'border-box';
+            div.innerText = errText;
+            
+            if (document.body) {
+                document.body.appendChild(div);
+            } else {
+                document.documentElement.appendChild(div);
+            }
+            return false;
+        };
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogiQ - Logical Measurement Portal</title>
+    <meta name="description" content="論理パズルゲームでIQを測定するインテリジェンス測定ポータル">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- 共通スタイル -->
+    <link rel="stylesheet" href="assets/css/global.css?v=8">
+</head>
+<body>
+    <!-- 背景演出 -->
+    <div class="ambient-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <!-- トースト通知用 -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <div class="app-container">
+
+        <!-- ==================== 1. DASHBOARD ==================== -->
+        <section id="dashboard" class="view active">
+            <header class="app-header">
+                <div class="brand">
+                    <span class="logo-dot"></span>
+                    <h1>LogiQ</h1>
+                </div>
+                <div class="points-badge">
+                    <span>🪙</span>
+                    <span id="user-points">0</span><span> CP</span>
+                    <button class="debug-add-btn" onclick="app.addDebugPoints()">+1000</button>
+                </div>
+            </header>
+
+            <nav class="tab-nav main-nav">
+                <button id="main-tab-btn-play" class="tab-btn active" onclick="app.switchMainTab('play')">PLAY</button>
+                <button id="main-tab-btn-achieve" class="tab-btn" onclick="app.switchMainTab('achieve')">ACHIEVE</button>
+                <button id="main-tab-btn-shop" class="tab-btn" onclick="app.switchMainTab('shop')">SHOP</button>
+            </nav>
+
+            <div class="tab-content-container">
+                <!-- PLAY タブ -->
+                <div id="main-tab-play" class="tab-content active">
+                    <!-- プロフィール/レーダーチャート -->
+                    <div class="profile-card">
+                        <div class="profile-info">
+                            <div class="avatar">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            </div>
+                            <div>
+                                <h2>GUEST PLAYER</h2>
+                                <p class="status-badge">未測定</p>
+                            </div>
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-label">最高IQ指数</span>
+                                <span id="global-iq" class="stat-value">--</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">測定済ゲーム</span>
+                                <span id="completed-count" class="stat-value">0/6</span>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <svg viewBox="0 0 100 100" class="radar-chart">
+                                <polygon points="50,15 80,37 69,73 31,73 20,37" class="grid-line" />
+                                <polygon points="50,27 71,43 63,67 37,67 29,43" class="grid-line" />
+                                <polygon points="50,38 62,48 57,61 43,61 38,48" class="grid-line" />
+                                <line x1="50" y1="50" x2="50" y2="15" class="axis-line" />
+                                <line x1="50" y1="50" x2="80" y2="37" class="axis-line" />
+                                <line x1="50" y1="50" x2="69" y2="73" class="axis-line" />
+                                <line x1="50" y1="50" x2="31" y2="73" class="axis-line" />
+                                <line x1="50" y1="50" x2="20" y2="37" class="axis-line" />
+                                <text x="50" y="10" class="chart-label">論理</text>
+                                <text x="85" y="38" class="chart-label">計画</text>
+                                <text x="73" y="80" class="chart-label">空間</text>
+                                <text x="27" y="80" class="chart-label">推理</text>
+                                <text x="10" y="38" class="chart-label">推論</text>
+                                <polygon id="radar-data" points="50,50 50,50 50,50 50,50 50,50" class="data-line" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- ゲームリスト -->
+                    <div class="games-section">
+                        <h3>MEASUREMENT GAMES</h3>
+                        <div class="games-list" id="games-list">
+                            <!-- app.jsで動的生成 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACHIEVE タブ -->
+                <div id="main-tab-achieve" class="tab-content">
+                    <div class="achieve-header" style="margin-bottom: 12px;">
+                        <h3>ACHIEVEMENTS</h3>
+                        <p>ゲームをクリアして実績を解除し、CPを獲得しましょう。</p>
+                    </div>
+                    <div id="achieve-list" class="shop-list" style="overflow-y:auto; flex-grow:1; padding-bottom:20px;">
+                        <!-- app.jsで動的生成 -->
+                    </div>
+                </div>
+
+                <!-- SHOP タブ -->
+                <div id="main-tab-shop" class="tab-content">
+                    <div class="charge-header">
+                        <h3>COSMIC POINTS SHOP</h3>
+                        <p>広告視聴や課金チャージ（デモ）でCPを増やせます。</p>
+                    </div>
+                    <div class="charge-section" style="margin-top: 12px;">
+                        <h4>FREE CP</h4>
+                        <div class="charge-card" onclick="app.watchAdForPoints()" style="background:white; border:1px solid var(--border-color); border-radius:20px; padding:12px; display:flex; align-items:center; gap:12px; cursor:pointer; margin-top:8px;">
+                            <div class="charge-icon" style="font-size:24px;">📺</div>
+                            <div class="charge-info" style="flex-grow:1;">
+                                <h5 style="font-size:12px; font-weight:700;">広告を視聴する</h5>
+                                <p style="font-size:9px; color:var(--text-sub);">動画を最後まで見てCPをチャージします。</p>
+                            </div>
+                            <button class="btn-skin-action" style="margin:0;">+200 CP</button>
+                        </div>
+                    </div>
+                    <div class="charge-section" style="margin-top: 18px;">
+                        <h4>CHARGE CP (DEMO)</h4>
+                        <div class="shop-list">
+                            <div class="charge-card" onclick="app.simulatePurchase(1000, 100)" style="background:white; border:1px solid var(--border-color); border-radius:20px; padding:12px; display:flex; align-items:center; gap:12px; cursor:pointer;">
+                                <div class="charge-icon" style="font-size:24px;">🪙</div>
+                                <div class="charge-info" style="flex-grow:1;">
+                                    <h5 style="font-size:12px; font-weight:700;">コズミックポイント 1,000</h5>
+                                    <p style="font-size:9px; color:var(--text-sub);">新しいスキンをすぐに解放したい時におすすめ。</p>
+                                </div>
+                                <button class="btn-skin-action" style="margin:0;">¥100</button>
+                            </div>
+                            <div class="charge-card" onclick="app.simulatePurchase(5000, 400)" style="background:white; border:1px solid var(--border-color); border-radius:20px; padding:12px; display:flex; align-items:center; gap:12px; cursor:pointer;">
+                                <div class="charge-icon" style="font-size:24px;">💎</div>
+                                <div class="charge-info" style="flex-grow:1;">
+                                    <h5 style="font-size:12px; font-weight:700;">コズミックポイント 5,000</h5>
+                                    <p style="font-size:9px; color:var(--text-sub);">複数のスキンを一気に解放したい時に最適。</p>
+                                </div>
+                                <button class="btn-skin-action" style="margin:0;">¥400</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 2. LOBBY ==================== -->
+        <section id="lobby-view" class="view">
+            <header class="lobby-header">
+                <button class="back-btn" onclick="app.showView('dashboard')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                </button>
+                <div class="lobby-title-container">
+                    <h2 id="lobby-game-title">Genesis Merge</h2>
+                    <p id="lobby-game-desc" class="lobby-desc">思考測定パズル</p>
+                </div>
+                <div class="points-badge">
+                    <span>🪙</span>
+                    <span id="lobby-points">0</span><span> CP</span>
+                </div>
+            </header>
+
+            <nav id="lobby-tab-nav" class="tab-nav lobby-nav">
+                <button id="lobby-tab-btn-start" class="tab-btn active" onclick="app.switchLobbyTab('start')">START</button>
+                <button id="lobby-tab-btn-skills" class="tab-btn" onclick="app.switchLobbyTab('skills')">SKILLS</button>
+                <button id="lobby-tab-btn-skins" class="tab-btn" onclick="app.switchLobbyTab('skins')">SKINS</button>
+                <button id="lobby-tab-btn-collection" class="tab-btn" onclick="app.switchLobbyTab('collection')">COLLECTION</button>
+            </nav>
+
+            <div class="lobby-tab-content-container" style="flex-grow:1; display:flex; flex-direction:column; overflow-y:auto;">
+                <!-- START タブ -->
+                <div id="lobby-tab-start" class="lobby-tab-content active">
+                    <div class="lobby-highscore-badge">
+                        <span class="trophy-icon">🏆</span>
+                        <div class="highscore-details">
+                            <span class="label">BEST RECORD</span>
+                            <span id="lobby-highscore-val">0</span>
+                        </div>
+                    </div>
+                    <div id="lobby-rules-card" class="game-instructions-card">
+                        <h3>ゲームルール</h3>
+                        <p>ゲームの遊び方がここに表示されます。</p>
+                    </div>
+                    <!-- 難易度選択セレクトボックス (ゲームに応じてJSから表示制御) -->
+                    <div class="lobby-difficulty-selector" id="lobby-difficulty-container" style="margin-top: 12px; display: none; width: 100%;">
+                        <label style="font-size: 10px; font-weight: 700; color: var(--text-sub); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;">測定難易度 (次元サイズ)</label>
+                        <select id="lobby-difficulty-select" style="width: 100%; height: 40px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-dark); border-radius: 14px; padding: 0 12px; font-family: inherit; font-size: 11.5px; font-weight: 600; outline: none; transition: all 0.2s; cursor: pointer; border-color: rgba(255,255,255,0.15);">
+                            <option value="easy">EASY (6x6次元)</option>
+                            <option value="normal" selected>NORMAL (8x8次元)</option>
+                            <option value="hard">HARD (10x10次元)</option>
+                            <option value="expert">EXPERT (15x15次元)</option>
+                        </select>
+                    </div>
+                    <div class="lobby-start-actions" style="display:flex; flex-direction:column; gap:8px; width:100%; margin-top:auto;">
+                        <button id="btn-resume-game" class="btn" onclick="app.playGameFromLobby(false)" style="display:none; background-color:#E27D60; color:white; border:none; height:48px; font-size:12px; border-radius:16px; font-weight:700;">
+                            前回の続きから再開する
+                        </button>
+                        <button id="btn-start-new" class="btn btn-primary btn-giant-play" onclick="app.playGameFromLobby(true)">
+                            思考測定を開始する
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SKINS タブ -->
+                <div id="lobby-tab-skins" class="lobby-tab-content">
+                    <div class="shop-list" id="skins-list"></div>
+                </div>
+
+                <!-- SKILLS タブ (縦型枝分かれスキルツリーUI) -->
+                <div id="lobby-tab-skills" class="lobby-tab-content">
+                    <div class="skill-tree-wrapper" style="display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%;">
+                        <!-- 縦型ツリー盤面（縦スクロール対応） -->
+                        <div class="vertical-tree-board" style="position: relative; width: 300px; height: 420px; background: rgba(255,255,255,0.02); border-radius: 24px; border: 1px dashed rgba(255,255,255,0.1); margin-top: 10px; overflow-y: auto; padding: 10px 0;">
+                            <div style="position: relative; width: 100%; height: 460px;">
+                                <!-- 背景接続線 (SVG - 14本) -->
+                                <svg style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
+                                    <!-- Tier 0 ➔ Tier 1 -->
+                                    <line x1="150" y1="30" x2="80" y2="100" id="line-boost" class="tree-line locked" stroke-width="3" />
+                                    <line x1="150" y1="30" x2="220" y2="100" id="line-undo" class="tree-line locked" stroke-width="3" />
+                                    
+                                    <!-- Tier 1 ➔ Tier 2 -->
+                                    <line x1="80" y1="100" x2="40" y2="180" id="line-grid5x5" class="tree-line locked" stroke-width="3" />
+                                    <line x1="80" y1="100" x2="120" y2="180" id="line-score1" class="tree-line locked" stroke-width="3" />
+                                    <line x1="220" y1="100" x2="180" y2="180" id="line-shuffle" class="tree-line locked" stroke-width="3" />
+                                    <line x1="220" y1="100" x2="260" y2="180" id="line-ad_skip" class="tree-line locked" stroke-width="3" />
+                                    
+                                    <!-- Tier 2 ➔ Tier 3 -->
+                                    <line x1="120" y1="180" x2="40" y2="260" id="line-score2" class="tree-line locked" stroke-width="3" />
+                                    <line x1="120" y1="180" x2="120" y2="260" id="line-time_limit" class="tree-line locked" stroke-width="3" />
+                                    <line x1="180" y1="180" x2="180" y2="260" id="line-combo" class="tree-line locked" stroke-width="3" />
+                                    <line x1="180" y1="180" x2="260" y2="260" id="line-saver" class="tree-line locked" stroke-width="3" />
+                                    
+                                    <!-- Tier 3 ➔ Tier 4 -->
+                                    <line x1="40" y1="260" x2="40" y2="340" id="line-score3" class="tree-line locked" stroke-width="3" />
+                                    <line x1="120" y1="260" x2="120" y2="340" id="line-mastery" class="tree-line locked" stroke-width="3" />
+                                    <line x1="180" y1="260" x2="180" y2="340" id="line-collector" class="tree-line locked" stroke-width="3" />
+                                    <line x1="260" y1="260" x2="260" y2="340" id="line-god_mode" class="tree-line locked" stroke-width="3" />
+                                </svg>
+
+                                <!-- Tier 0 ノード -->
+                                <div class="tree-node core active" id="node-core" onclick="app.selectSkillNode('core')" style="position: absolute; left: 128px; top: 10px; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: all 0.3s; background: var(--accent); color: white; box-shadow: 0 0 16px var(--accent); z-index: 10;">
+                                    🧠
+                                </div>
+
+                                <!-- Tier 1 ノード -->
+                                <div class="tree-node locked" id="node-boost" onclick="app.selectSkillNode('boost')" style="position: absolute; left: 58px; top: 78px; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: all 0.3s; z-index: 10;">
+                                    🚀
+                                </div>
+                                <div class="tree-node locked" id="node-undo" onclick="app.selectSkillNode('undo')" style="position: absolute; left: 198px; top: 78px; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: all 0.3s; z-index: 10;">
+                                    ↩️
+                                </div>
+
+                                <!-- Tier 2 ノード -->
+                                <div class="tree-node locked" id="node-grid5x5" onclick="app.selectSkillNode('grid5x5')" style="position: absolute; left: 18px; top: 158px; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.3s; z-index: 10;">
+                                    5x5
+                                </div>
+                                <div class="tree-node locked" id="node-score1" onclick="app.selectSkillNode('score1')" style="position: absolute; left: 98px; top: 158px; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: all 0.3s; z-index: 10;">
+                                    ➕
+                                </div>
+                                <div class="tree-node locked" id="node-shuffle" onclick="app.selectSkillNode('shuffle')" style="position: absolute; left: 158px; top: 158px; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: all 0.3s; z-index: 10;">
+                                    🔀
+                                </div>
+                                <div class="tree-node locked" id="node-ad_skip" onclick="app.selectSkillNode('ad_skip')" style="position: absolute; left: 238px; top: 158px; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: all 0.3s; z-index: 10;">
+                                    📺
+                                </div>
+
+                                <!-- Tier 3 ノード -->
+                                <div class="tree-node locked" id="node-score2" onclick="app.selectSkillNode('score2')" style="position: absolute; left: 18px; top: 238px; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: all 0.3s; z-index: 10;">
+                                    ⭐
+                                </div>
+                                <div class="tree-node locked" id="node-time_limit" onclick="app.selectSkillNode('time_limit')" style="position: absolute; left: 98px; top: 238px; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: all 0.3s; z-index: 10;">
+                                    ⏳
+                                </div>
+                                <div class="tree-node locked" id="node-combo" onclick="app.selectSkillNode('combo')" style="position: absolute; left: 158px; top: 238px; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: all 0.3s; z-index: 10;">
+                                    ⚡
+                                </div>
+                                <div class="tree-node locked" id="node-saver" onclick="app.selectSkillNode('saver')" style="position: absolute; left: 238px; top: 238px; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: all 0.3s; z-index: 10;">
+                                    🛡️
+                                </div>
+
+                                <!-- Tier 4 ノード -->
+                                <div class="tree-node locked" id="node-score3" onclick="app.selectSkillNode('score3')" style="position: absolute; left: 18px; top: 318px; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: all 0.3s; z-index: 10;">
+                                    👑
+                                </div>
+                                <div class="tree-node locked" id="node-mastery" onclick="app.selectSkillNode('mastery')" style="position: absolute; left: 98px; top: 318px; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: all 0.3s; z-index: 10;">
+                                    🎓
+                                </div>
+                                <div class="tree-node locked" id="node-collector" onclick="app.selectSkillNode('collector')" style="position: absolute; left: 158px; top: 318px; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: all 0.3s; z-index: 10;">
+                                    🔍
+                                </div>
+                                <div class="tree-node locked" id="node-god_mode" onclick="app.selectSkillNode('god_mode')" style="position: absolute; left: 238px; top: 318px; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: all 0.3s; z-index: 10;">
+                                    👁️
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 選択アビリティ詳細パネル -->
+                        <div id="skill-detail-panel" class="game-instructions-card" style="width: 100%; min-height: 110px; margin-top: 5px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.3s; border-left: 4px solid var(--accent);">
+                            <div id="skill-detail-content">
+                                <h4 id="skill-detail-title" style="font-size: 13px; font-weight: 700; color: var(--text-dark);">アビリティを選択してください</h4>
+                                <p id="skill-detail-desc" style="font-size: 9.5px; color: var(--text-sub); margin-top: 4px;">ツリー上のノードをタップすると、詳細とON/OFFトグルが表示されます。</p>
+                            </div>
+                            <div id="skill-detail-action" style="margin-top: 10px; display: flex; justify-content: flex-end;">
+                                <!-- ボタンが動的に挿入されます -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLLECTION タブ -->
+                <div id="lobby-tab-collection" class="lobby-tab-content">
+                    <div class="sub-tab-nav scrollable-tabs">
+                        <button id="sub-tab-celestial" class="sub-tab-btn active" onclick="app.switchCollectionTab('celestial')">天体図鑑</button>
+                        <button id="sub-tab-gems" class="sub-tab-btn" onclick="app.switchCollectionTab('gems')">宝石図鑑</button>
+                    </div>
+                    <div id="collection-grid" class="collection-grid"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 3. 共通ゲームビュー (SINGLE STAGE) ==================== -->
+        <section id="game-view" class="view">
+            <header class="game-header">
+                <button class="back-btn" onclick="app.exitGame()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                </button>
+                <div class="game-title-container">
+                    <h2 id="active-game-title">Game Title</h2>
+                    <span class="measuring-indicator">● 分析中...</span>
+                </div>
+                <!-- 共通ステータスヘッダー: ゲームに応じてJSから表示非表示やテキストを変更 -->
+                <div class="game-stats-header" id="game-stats-header">
+                    <div class="header-stat" id="stat-box-1">
+                        <span class="label" id="stat-label-1">SCORE</span>
+                        <span id="stat-value-1">0</span>
+                    </div>
+                    <div class="header-stat" id="stat-box-2">
+                        <span class="label" id="stat-label-2">MOVE</span>
+                        <span id="stat-value-2">0</span>
+                    </div>
+                    <div class="header-stat" id="stat-box-3">
+                        <span class="label" id="stat-label-3">TIME</span>
+                        <span id="stat-value-3">0秒</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="board-container">
+                <!-- すべてのゲームのDOMがこのステージに動的生成(マウント)されます -->
+                <div id="game-stage"></div>
+            </div>
+
+            <!-- 進化インジケーター（Mergeゲームのみ表示） -->
+            <div id="evolution-indicator" class="evolution-indicator" style="display:none; justify-content:center; gap:4px; align-items:center; margin-bottom:12px; overflow-x:auto; padding:4px 0;"></div>
+
+            <div class="control-guide" id="game-control-guide">
+                <p id="game-guide-text" class="guide-text">操作ガイドがここに表示されます。</p>
+            </div>
+        </section>
+
+        <!-- ==================== 4. 測定結果画面 ==================== -->
+        <section id="result-view" class="view">
+            <div class="result-card">
+                <span class="badge-success" id="result-badge-status">MEASUREMENT COMPLETE</span>
+                <h2 id="result-header-text">測定結果</h2>
+                <div class="score-circle">
+                    <span class="score-label" id="result-iq-label">推定IQ</span>
+                    <span id="result-iq" class="score-number">120</span>
+                    <span id="result-percent" class="score-percent">上位 9.1%</span>
+                </div>
+                <div class="result-stats">
+                    <div class="result-stat-row"><span>獲得スコア</span><strong id="result-score">0</strong></div>
+                    <div class="result-stat-row"><span id="result-time-label">クリア時間</span><strong id="result-time">--</strong></div>
+                    <div class="result-stat-row"><span id="result-moves-label">総手数</span><strong id="result-moves">--</strong></div>
+                </div>
+                <div class="evaluation-box">
+                    <p id="evaluation-text">測定結果を分析しています...</p>
+                </div>
+                <div class="result-actions">
+                    <button id="btn-continue" class="btn btn-primary" onclick="app.continueEndless()">このまま続ける (エンドレス)</button>
+                    <button class="btn btn-secondary" onclick="app.showView('lobby-view')">ロビーへ戻る</button>
+                    <button class="btn btn-secondary" onclick="app.retryGame()">もう一度測定する</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 共通広告モーダル ==================== -->
+        <div id="ad-modal" class="modal-overlay">
+            <div class="ad-modal-content">
+                <span class="ad-badge">SPONSOR AD</span>
+                <h3>特典獲得のための広告を再生中</h3>
+                <p>動画終了まであと <span id="ad-timer">3</span> 秒...</p>
+                <div class="ad-progress-bar">
+                    <div id="ad-progress" class="ad-progress-fill"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 共通・基底クラス -->
+    <script src="src/core/game-base.js?v=8"></script>
+
+    <!-- 各ゲームモジュール（JSのロード） -->
+    <script src="src/games/merge/merge-game.js?v=8"></script>
+    <script src="src/games/king/king-game.js?v=8"></script>
+    <script src="src/games/mastermind/mastermind-game.js?v=8"></script>
+    <script src="src/games/nonogram/nonogram-game.js?v=8"></script>
+    <script src="src/games/einstein/einstein-game.js?v=8"></script>
+    <script src="src/games/hashi/hashi-game.js?v=8"></script>
+
+    <!-- ポータルコアエンジン ＆ サブシステム -->
+    <script src="src/core/registry.js?v=8"></script>
+    <script src="src/core/achievements.js?v=8"></script>
+    <script src="src/core/app.js?v=8"></script>
+</body>
+</html>

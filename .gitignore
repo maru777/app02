@@ -1,0 +1,16 @@
+# AI coding rule files
+.clinerules
+.cursorrules
+
+# Development test files
+test-report.html
+test_*.png
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+*.suo
+*.user

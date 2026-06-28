@@ -1,0 +1,126 @@
+/* ==========================================
+   Einstein Grid 専用スタイル
+   ========================================== */
+
+.ein-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 340px;
+}
+
+/* ヒントパネル */
+.ein-hints-panel {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 12px;
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--text-main);
+}
+
+.ein-hints-title {
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+}
+
+.ein-hints-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ein-hint-item {
+    color: var(--text-sub);
+}
+
+/* グリッドテーブル */
+.ein-matrix-container {
+    width: 100%;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.02);
+    overflow-x: auto;
+}
+
+.ein-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.ein-table th, .ein-table td {
+    width: 42px;
+    height: 40px;
+    text-align: center;
+    vertical-align: middle;
+    border: 0.5px solid rgba(0,0,0,0.08);
+}
+
+.ein-table th {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--text-sub);
+    background-color: var(--bg-primary);
+}
+
+.ein-table th:first-child, .ein-table td:first-child {
+    width: 65px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-main);
+    background-color: var(--bg-primary);
+    border-left: none;
+}
+
+/* グリッドのカテゴリ境界線 */
+.ein-table th:nth-child(4), .ein-table td:nth-child(4) {
+    border-right: 2px solid rgba(51,56,53,0.3);
+}
+
+.ein-cell {
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    background: white;
+    user-select: none;
+    transition: background-color 0.15s;
+}
+
+.ein-cell:hover {
+    background-color: var(--bg-primary);
+}
+
+/* マークごとのカラーリング */
+.ein-cell.state-cross {
+    color: #E27D60;
+    background-color: rgba(226, 125, 96, 0.04);
+}
+
+.ein-cell.state-circle {
+    color: #4CAF7D;
+    background-color: rgba(76, 175, 125, 0.05);
+}
+
+.ein-actions {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.ein-actions .btn {
+    flex: 1;
+    height: 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

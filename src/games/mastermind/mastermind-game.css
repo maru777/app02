@@ -1,0 +1,162 @@
+/* ==========================================
+   Mastermind 専用スタイル
+   ========================================== */
+
+.mm-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 320px;
+}
+
+/* 履歴リストパネル */
+.mm-history-panel {
+    width: 100%;
+    height: 140px;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 10px 14px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.mm-empty-history {
+    font-size: 11px;
+    color: var(--text-light);
+    text-align: center;
+    margin: auto;
+}
+
+.mm-history-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    padding: 6px 10px;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    animation: mmSlideIn 0.2s ease-out;
+}
+
+@keyframes mmSlideIn {
+    0% { transform: translateY(8px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+.mm-round-num {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--text-light);
+    width: 24px;
+}
+
+.mm-guess-val {
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--text-main);
+}
+
+.mm-result-badge {
+    display: flex;
+    gap: 6px;
+}
+
+.badge-hit {
+    background-color: rgba(76, 175, 125, 0.12);
+    color: #4CAF7D;
+    font-weight: 700;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 6px;
+}
+
+.badge-blow {
+    background-color: rgba(244, 200, 66, 0.15);
+    color: #C69500;
+    font-weight: 700;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 6px;
+}
+
+/* 入力ディスプレイスロット */
+.mm-input-display {
+    display: flex;
+    gap: 12px;
+    margin: 8px 0;
+}
+
+.mm-digit-slot {
+    width: 44px;
+    height: 44px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 800;
+    background: white;
+    transition: all 0.15s;
+    color: var(--text-main);
+}
+
+.mm-digit-slot.filled {
+    border-color: var(--accent);
+    transform: scale(1.04);
+}
+
+/* テンキーボード */
+.mm-keyboard {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    width: 100%;
+}
+
+.mm-key {
+    height: 44px;
+    border-radius: 14px;
+    border: 1px solid var(--border-color);
+    background: white;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    color: var(--text-main);
+    transition: all 0.1s;
+    user-select: none;
+}
+
+.mm-key:active {
+    transform: scale(0.95);
+    background-color: var(--bg-primary);
+}
+
+.mm-key.disabled-key {
+    opacity: 0.3;
+    cursor: not-allowed;
+    background-color: var(--bg-primary);
+    pointer-events: none;
+}
+
+.clear-key {
+    color: #E27D60;
+    background-color: rgba(226, 125, 96, 0.05);
+}
+
+.enter-key {
+    color: var(--accent);
+    background-color: var(--accent-light);
+    font-size: 11px;
+}
+.enter-key:hover {
+    background-color: var(--accent);
+    color: white;
+}
