@@ -21,7 +21,7 @@ window.GAME_REGISTRY = [
         stats: [
             { id: 1, label: 'SCORE', valId: 'merge-score', fallback: '0' },
             { id: 2, label: 'MOVES', valId: 'merge-moves', fallback: '0' },
-            { id: 3, label: 'TIME', valId: 'merge-time', fallback: '0秒' }
+            { id: 3, label: 'TIME', valId: 'merge-time', fallback: '00:00:00' }
         ],
         guide: 'キーボードの矢印キーまたはスワイプでタイルを動かし、同じ物質をマージして進化させていきます。目標は究極の進化形態に到達することです。'
     },
@@ -43,7 +43,7 @@ window.GAME_REGISTRY = [
         stats: [
             { id: 1, label: 'CORES', valId: 'king-count', fallback: '0' },
             { id: 2, label: 'ATTEMPTS', valId: 'king-attempts', fallback: '0' },
-            { id: 3, label: 'TIME', valId: 'king-time', fallback: '0秒' }
+            { id: 3, label: 'TIME', valId: 'king-time', fallback: '00:00:00' }
         ],
         guide: '各セクター、行、列に1つ、周囲8マスに隣接しないようにエネルギーコア（🔮）を配置します。'
     },
@@ -65,7 +65,7 @@ window.GAME_REGISTRY = [
         stats: [
             { id: 1, label: 'ERRORS', valId: 'einstein-errors', fallback: '0' },
             { id: 2, label: 'PROGRESS', valId: 'einstein-progress', fallback: '0%' },
-            { id: 3, label: 'TIME', valId: 'einstein-time', fallback: '0秒' }
+            { id: 3, label: 'TIME', valId: 'einstein-time', fallback: '00:00:00' }
         ],
         guide: 'ヒントを元に、グリッドの各セルに正しい「記号」を配置していきます。縦横での重複はありません。'
     }

@@ -102,12 +102,25 @@ body {
 }
 .view.active { display: flex; }
 
-.app-header, .lobby-header, .game-header {
+.app-header, .lobby-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
     flex-shrink: 0;
+}
+.game-header {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 16px;
+    flex-shrink: 0;
+}
+.game-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
 }
 
 .brand h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
@@ -291,10 +304,11 @@ body {
 /* ==========================================
    共通ゲーム実行画面 (単一ステージ設計)
    ========================================== */
-.game-title-container h2 { font-size: 15px; font-weight: 700; }
-.measuring-indicator { font-size: 8px; color: var(--accent); font-weight: 700; }
+.game-title-container { display: flex; flex-direction: column; align-items: center; }
+.game-title-container h2 { font-size: 15px; font-weight: 700; text-align: center; }
+.measuring-indicator { font-size: 8px; color: var(--accent); font-weight: 700; text-align: center; }
 
-.game-stats-header { display: flex; gap: 4px; }
+.game-stats-header { display: flex; gap: 4px; width: 100%; justify-content: flex-end; }
 .header-stat {
     background: white; border: 1px solid var(--border-color); padding: 3px 8px;
     border-radius: 10px; display: flex; flex-direction: column; align-items: center;
@@ -302,6 +316,8 @@ body {
 }
 .header-stat .label { font-size: 7px; color: var(--text-sub); font-weight: 700; text-transform: uppercase; }
 .header-stat span:not(.label) { font-size: 11px; font-weight: 800; }
+.header-stat.best-stat { background: var(--accent); color: white; border-color: var(--accent); margin-right: auto; }
+.header-stat.best-stat .label { color: rgba(255, 255, 255, 0.8); }
 
 /* ゲーム盤面領域 */
 .board-container {
@@ -549,6 +565,10 @@ body {
     color: rgba(255,255,255,0.2);
     border: 1px dashed rgba(255,255,255,0.15);
     cursor: not-allowed;
+}
+.tree-node.unavailable {
+    opacity: 0.5;
+    filter: grayscale(100%);
 }
 .tree-node:hover:not(.locked) {
     transform: scale(1.08);

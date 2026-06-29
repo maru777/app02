@@ -278,8 +278,8 @@ class MergeGame extends LogiqGames.GameBase {
         `;
 
         this.boardElement = this.containerElement.querySelector('#grid-board');
-        this.boardElement.addEventListener('touchstart', this.boundTouchStart, { passive: true });
-        this.boardElement.addEventListener('touchend', this.boundTouchEnd, { passive: true });
+        this.containerElement.addEventListener('touchstart', this.boundTouchStart, { passive: true });
+        this.containerElement.addEventListener('touchend', this.boundTouchEnd, { passive: true });
     }
 
     confirmReset() {
@@ -836,9 +836,9 @@ class MergeGame extends LogiqGames.GameBase {
     }
 
     destroy() {
-        if (this.boardElement) {
-            this.boardElement.removeEventListener('touchstart', this.boundTouchStart);
-            this.boardElement.removeEventListener('touchend', this.boundTouchEnd);
+        if (this.containerElement) {
+            this.containerElement.removeEventListener('touchstart', this.boundTouchStart);
+            this.containerElement.removeEventListener('touchend', this.boundTouchEnd);
         }
         super.destroy();
     }

@@ -371,12 +371,15 @@
         <!-- ==================== 3. 共通ゲームビュー (SINGLE STAGE) ==================== -->
         <section id="game-view" class="view">
             <header class="game-header">
-                <button class="back-btn" onclick="app.exitGame()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-                </button>
-                <div class="game-title-container">
-                    <h2 id="active-game-title">Game Title</h2>
-                    <span class="measuring-indicator">● 分析中...</span>
+                <div class="game-header-top">
+                    <button class="back-btn" onclick="app.exitGame()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                    </button>
+                    <div class="game-title-container">
+                        <h2 id="active-game-title">Game Title</h2>
+                        <span class="measuring-indicator">● 分析中...</span>
+                    </div>
+                    <div style="width: 44px;"></div>
                 </div>
                 <!-- 共通ステータスヘッダー: ゲームに応じてJSから表示非表示やテキストを変更 -->
                 <div class="game-stats-header" id="game-stats-header">
@@ -390,7 +393,7 @@
                     </div>
                     <div class="header-stat" id="stat-box-3">
                         <span class="label" id="stat-label-3">TIME</span>
-                        <span id="stat-value-3">0秒</span>
+                        <span id="stat-value-3">00:00:00</span>
                     </div>
                 </div>
             </header>

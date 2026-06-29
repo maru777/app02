@@ -311,18 +311,18 @@ class App {
             statsHeader.appendChild(box);
         });
 
-        // BESTスコア欄を追加
+        // BESTスコア欄を左端に追加
         const gameId = this.currentGameConfig.id;
         const best = this.highScores[gameId] || 0;
         if (best > 0) {
             const bestBox = document.createElement('div');
-            bestBox.className = 'header-stat';
+            bestBox.className = 'header-stat best-stat';
             bestBox.id = 'stat-best-box';
             bestBox.innerHTML = `
                 <span class="label">BEST</span>
                 <span id="stat-best-value">${best}</span>
             `;
-            statsHeader.appendChild(bestBox);
+            statsHeader.insertBefore(bestBox, statsHeader.firstChild);
         }
     }
 
@@ -363,7 +363,8 @@ class App {
                     const el = document.getElementById('merge-moves');
                     if (el) el.innerText = moves;
                 },
-                saveStateCallback: (data) => localStorage.setItem('logiq_save_game', JSON.stringify(data))
+                saveStateCallback: (data) => localStorage.setItem('logiq_save_game', JSON.stringify(data)),
+                onUnlockCallback: (val) => this.handleUnlock('merge', val)
             });
         }
 
@@ -388,6 +389,31 @@ class App {
         }
 
         return base;
+    }
+
+    handleUnlock(gameId, val) {
+        if (gameId === 'merge') {
+            const currentSkin = this.activeGameInstance?.currentSkin || localStorage.getItem('logiq_current_skin') || 'numbers';
+            const collectionMap = {
+                celestial: { prop: 'unlockedCelestials', lsKey: 'logiq_unlocked_celestials' },
+                gems: { prop: 'unlockedGems', lsKey: 'logiq_unlocked_gems' },
+                kanji_large: { prop: 'unlockedKanjiLarge', lsKey: 'logiq_unlocked_kanji_large' },
+                kanji_small: { prop: 'unlockedKanjiSmall', lsKey: 'logiq_unlocked_kanji_small' },
+                si_prefix: { prop: 'unlockedSiPrefix', lsKey: 'logiq_unlocked_si_prefix' },
+                element: { prop: 'unlockedElement', lsKey: 'logiq_unlocked_element' },
+                guild: { prop: 'unlockedGuild', lsKey: 'logiq_unlocked_guild' }
+            };
+            const mapInfo = collectionMap[currentSkin];
+            if (mapInfo) {
+                const list = this[mapInfo.prop];
+                if (!list.includes(String(val))) {
+                    list.push(String(val));
+                    localStorage.setItem(mapInfo.lsKey, JSON.stringify(list));
+                    this.showToast(`✨ 進化の過程に新しいタイルが登録されました！`);
+                    this.renderCollectionGrid();
+                }
+            }
+        }
     }
 
     handleGameWin(gameId, score, timeSec, moves, extra) {
@@ -734,7 +760,14 @@ class App {
             const skill = GameClass.SKILLS[nodeId];
             const state = localStorage.getItem(`logiq_skill_${gameId}_${nodeId}`) || (nodeId === 'core' ? 'active' : 'locked');
             
-            nodeEl.className = `tree-node ${state}`;
+            let extraClass = '';
+            if (state === 'locked') {
+                const parentKey = skill.parent;
+                const parentActive = !parentKey || parentKey === 'core' || localStorage.getItem(`logiq_skill_${gameId}_${parentKey}`) === 'active';
+                if (!parentActive) extraClass = ' unavailable';
+            }
+
+            nodeEl.className = `tree-node ${state}${extraClass}`;
             if (domId === this.selectedSkillId) nodeEl.classList.add('selected-node');
             nodeEl.innerText = skill.icon;
         });
@@ -1064,9 +1097,10 @@ class App {
     }
 
     formatTime(sec) {
-        const m = Math.floor(sec / 60);
+        const h = Math.floor(sec / 3600);
+        const m = Math.floor((sec % 3600) / 60);
         const s = sec % 60;
-        return m > 0 ? `${m}分${s}秒` : `${s}秒`;
+        return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
     }
 
     // ===== ポータル全体の追加機能メソッド (復元) =====
