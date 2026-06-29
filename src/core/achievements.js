@@ -12,15 +12,7 @@ window.ACHIEVEMENTS = [
             return Object.values(app.highScores).some(score => score > 0);
         }
     },
-    {
-        id: 'logic_master',
-        title: '高IQ論理知性',
-        desc: 'いずれかの測定でIQ 130以上を達成する',
-        reward: 500,
-        check: (app) => {
-            return Object.values(app.highestIQs).some(iq => parseInt(iq) >= 130);
-        }
-    },
+
     {
         id: 'collector_5',
         title: '量子・宇宙の収集家',

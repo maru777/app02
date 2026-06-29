@@ -104,37 +104,15 @@
                         </div>
                         <div class="stats-grid">
                             <div class="stat-item">
-                                <span class="stat-label">最高IQ指数</span>
-                                <span id="global-iq" class="stat-value">--</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-label">測定済ゲーム</span>
+                                <span class="stat-label">プレイ済ゲーム</span>
                                 <span id="completed-count" class="stat-value">0/6</span>
                             </div>
-                        </div>
-                        <div class="chart-container">
-                            <svg viewBox="0 0 100 100" class="radar-chart">
-                                <polygon points="50,15 80,37 69,73 31,73 20,37" class="grid-line" />
-                                <polygon points="50,27 71,43 63,67 37,67 29,43" class="grid-line" />
-                                <polygon points="50,38 62,48 57,61 43,61 38,48" class="grid-line" />
-                                <line x1="50" y1="50" x2="50" y2="15" class="axis-line" />
-                                <line x1="50" y1="50" x2="80" y2="37" class="axis-line" />
-                                <line x1="50" y1="50" x2="69" y2="73" class="axis-line" />
-                                <line x1="50" y1="50" x2="31" y2="73" class="axis-line" />
-                                <line x1="50" y1="50" x2="20" y2="37" class="axis-line" />
-                                <text x="50" y="10" class="chart-label">論理</text>
-                                <text x="85" y="38" class="chart-label">計画</text>
-                                <text x="73" y="80" class="chart-label">空間</text>
-                                <text x="27" y="80" class="chart-label">推理</text>
-                                <text x="10" y="38" class="chart-label">推論</text>
-                                <polygon id="radar-data" points="50,50 50,50 50,50 50,50 50,50" class="data-line" />
-                            </svg>
                         </div>
                     </div>
 
                     <!-- ゲームリスト -->
                     <div class="games-section">
-                        <h3>MEASUREMENT GAMES</h3>
+                        <h3>LOGIQ GAMES</h3>
                         <div class="games-list" id="games-list">
                             <!-- app.jsで動的生成 -->
                         </div>
@@ -231,7 +209,6 @@
                         <h3>ゲームルール</h3>
                         <p>ゲームの遊び方がここに表示されます。</p>
                     </div>
-                    <!-- 難易度選択セレクトボックス (ゲームに応じてJSから表示制御) -->
                     <div class="lobby-difficulty-selector" id="lobby-difficulty-container" style="margin-top: 12px; display: none; width: 100%;">
                         <label style="font-size: 10px; font-weight: 700; color: var(--text-sub); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;">測定難易度 (次元サイズ)</label>
                         <select id="lobby-difficulty-select" style="width: 100%; height: 40px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-dark); border-radius: 14px; padding: 0 12px; font-family: inherit; font-size: 11.5px; font-weight: 600; outline: none; transition: all 0.2s; cursor: pointer; border-color: rgba(255,255,255,0.15);">
@@ -241,7 +218,16 @@
                             <option value="expert">EXPERT (15x15次元)</option>
                         </select>
                     </div>
-                    <div class="lobby-start-actions" style="display:flex; flex-direction:column; gap:8px; width:100%; margin-top:auto;">
+
+                    <!-- ステージ選択グリッド (ステージ制ゲームの場合のみ表示) -->
+                    <div id="lobby-stage-selector" style="display: none; margin-top: 16px; width: 100%;">
+                        <h4 style="font-size: 12px; margin-bottom: 8px; color: var(--text-dark);">Select Stage</h4>
+                        <div id="stage-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;">
+                            <!-- JSで動的生成 -->
+                        </div>
+                    </div>
+
+                    <div class="lobby-start-actions" id="lobby-normal-start-actions" style="display:flex; flex-direction:column; gap:8px; width:100%; margin-top:auto;">
                         <button id="btn-resume-game" class="btn" onclick="app.playGameFromLobby(false)" style="display:none; background-color:#E27D60; color:white; border:none; height:48px; font-size:12px; border-radius:16px; font-weight:700;">
                             前回の続きから再開する
                         </button>
@@ -460,6 +446,8 @@
     <script src="src/games/nonogram/nonogram-game.js?v=8"></script>
     <script src="src/games/einstein/einstein-game.js?v=8"></script>
     <script src="src/games/hashi/hashi-game.js?v=8"></script>
+    <script src="src/games/slide/stages.js?v=8"></script>
+    <script src="src/games/slide/slide-game.js?v=8"></script>
 
     <!-- ポータルコアエンジン ＆ サブシステム -->
     <script src="src/core/registry.js?v=8"></script>

@@ -1,0 +1,99 @@
+/* Color Slide Game Styles */
+#slide-stage {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    box-sizing: border-box;
+    flex-grow: 1;
+}
+
+.slide-board {
+    position: relative;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    overflow: hidden;
+    /* Dimensions will be set via JS inline styles depending on the stage */
+}
+
+/* Grid Cell */
+.slide-cell {
+    position: absolute;
+    box-sizing: border-box;
+    border: 1px dashed rgba(255,255,255,0.05);
+}
+
+.slide-cell.wall {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+}
+
+.slide-cell.exit {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    font-weight: 900;
+    text-shadow: 0 0 5px rgba(255,255,255,0.5);
+    background-image: repeating-linear-gradient(
+        45deg,
+        rgba(0,0,0,0.1),
+        rgba(0,0,0,0.1) 10px,
+        rgba(255,255,255,0.1) 10px,
+        rgba(255,255,255,0.1) 20px
+    );
+    border: 2px dashed rgba(255,255,255,0.6);
+}
+
+.slide-cell.exit::after {
+    content: 'EXIT';
+    font-size: 10px;
+    color: rgba(255,255,255,0.8);
+    position: absolute;
+    bottom: 2px;
+    letter-spacing: 1px;
+}
+
+/* Blocks */
+.slide-block {
+    position: absolute;
+    transition: transform 0.1s linear; /* for smooth sliding */
+    cursor: grab;
+    z-index: 10;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+    touch-action: none; /* prevent scrolling when swiping block */
+}
+
+.slide-block:active {
+    cursor: grabbing;
+}
+
+/* Shape rendering inside block */
+.slide-block-part {
+    position: absolute;
+    box-sizing: border-box;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 6px;
+    box-shadow: inset 0 0 10px rgba(255,255,255,0.2);
+}
+
+/* Exit/Block Colors */
+.slide-color-red { background-color: #E63946; }
+.slide-color-blue { background-color: #457B9D; }
+.slide-color-green { background-color: #2A9D8F; }
+.slide-color-yellow { background-color: #E9C46A; color: #333; }
+.slide-color-purple { background-color: #9D4EDD; }
+.slide-color-cyan { background-color: #00B4D8; }
+.slide-color-orange { background-color: #F4A261; }
+
+.slide-cell.exit.slide-color-red { border-color: #E63946; color: #E63946; background-color: rgba(230, 57, 70, 0.2); }
+.slide-cell.exit.slide-color-blue { border-color: #457B9D; color: #457B9D; background-color: rgba(69, 123, 157, 0.2); }
+.slide-cell.exit.slide-color-green { border-color: #2A9D8F; color: #2A9D8F; background-color: rgba(42, 157, 143, 0.2); }
+.slide-cell.exit.slide-color-yellow { border-color: #E9C46A; color: #E9C46A; background-color: rgba(233, 196, 106, 0.2); }
+.slide-cell.exit.slide-color-purple { border-color: #9D4EDD; color: #9D4EDD; background-color: rgba(157, 78, 221, 0.2); }
+.slide-cell.exit.slide-color-cyan { border-color: #00B4D8; color: #00B4D8; background-color: rgba(0, 180, 216, 0.2); }
+.slide-cell.exit.slide-color-orange { border-color: #F4A261; color: #F4A261; background-color: rgba(244, 162, 97, 0.2); }

@@ -18,14 +18,6 @@ class App {
             hashi: parseInt(localStorage.getItem('logiq_hashi_highscore') || '0')
         };
 
-        this.highestIQs = {
-            merge: localStorage.getItem('logiq_merge_highest_iq') || '---',
-            king: localStorage.getItem('logiq_king_highest_iq') || '---',
-            mastermind: localStorage.getItem('logiq_einstein_highest_iq') || '---',
-            nonogram: localStorage.getItem('logiq_nonogram_highest_iq') || '---',
-            einstein: localStorage.getItem('logiq_einstein_highest_iq') || '---',
-            hashi: localStorage.getItem('logiq_hashi_highest_iq') || '---'
-        };
 
         // 所持ポイント (CP)
         this.points = parseInt(localStorage.getItem('logiq_points') || '0');
@@ -98,7 +90,6 @@ class App {
             card.style.borderLeft = `5px solid ${cfg.color}`;
             
             const high = this.highScores[cfg.id] || 0;
-            const iq = this.highestIQs[cfg.id] || '---';
 
             card.innerHTML = `
                 <div class="game-icon-circle" style="background-color: ${cfg.bgColor}; color: ${cfg.color};">
@@ -115,9 +106,6 @@ class App {
                             <span class="label" style="font-size: 7.5px; color: var(--text-sub); display: block; text-transform: uppercase; letter-spacing: 0.3px;">HIGH SCORE</span>
                             <span class="value" style="font-size: 11px; font-weight: 700; color: var(--text-dark);">${high}</span>
                         </div>
-                        <div class="stat">
-                            <span class="label" style="font-size: 7.5px; color: var(--text-sub); display: block; text-transform: uppercase; letter-spacing: 0.3px;">${cfg.iqLabel}</span>
-                            <span class="value" style="font-size: 11px; font-weight: 700; color: var(--text-dark);">${iq}</span>
                         </div>
                     </div>
                 </div>
@@ -150,6 +138,18 @@ class App {
             diffContainer.style.display = gameId === 'king' ? 'block' : 'none';
         }
 
+        // ステージ制ゲームの場合、STARTアクションを隠してステージグリッドを表示
+        const stageSelector = document.getElementById('lobby-stage-selector');
+        const normalActions = document.getElementById('lobby-normal-start-actions');
+        if (cfg.hasStages) {
+            if (stageSelector) stageSelector.style.display = 'block';
+            if (normalActions) normalActions.style.display = 'none';
+            this.renderStageGrid(cfg);
+        } else {
+            if (stageSelector) stageSelector.style.display = 'none';
+            if (normalActions) normalActions.style.display = 'flex';
+        }
+
         // ガイド説明の更新
         const ruleEl = document.getElementById('lobby-rule-content');
         if (ruleEl) {
@@ -159,6 +159,32 @@ class App {
         this.checkSaveGame();
         this.switchLobbyTab('start'); // 初期タブは 'start' (START)
         this.showView('lobby-view');
+    }
+
+    renderStageGrid(cfg) {
+        const grid = document.getElementById('stage-grid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        
+        const unlockedStages = parseInt(localStorage.getItem(`logiq_unlocked_stages_${cfg.id}`) || '1');
+        // デモ用としてまずは5ステージ分
+        const totalStages = 5;
+
+        for (let i = 1; i <= totalStages; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'btn';
+            const isUnlocked = i <= unlockedStages;
+            
+            if (isUnlocked) {
+                btn.style.cssText = `background: ${cfg.bgColor}; color: ${cfg.color}; border: 1px solid ${cfg.color}; font-weight: bold; border-radius: 8px; height: 48px;`;
+                btn.innerText = i;
+                btn.onclick = () => this.playGameFromLobby(true, i);
+            } else {
+                btn.style.cssText = `background: rgba(255,255,255,0.05); color: var(--text-sub); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; height: 48px; cursor: not-allowed; display: flex; justify-content: center; align-items: center;`;
+                btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
+            }
+            grid.appendChild(btn);
+        }
     }
 
     switchLobbyTab(tabName) {
@@ -233,7 +259,7 @@ class App {
         }
     }
 
-    playGameFromLobby(forceNew = false) {
+    playGameFromLobby(forceNew = false, stageNum = 1) {
         const cfg = this.currentGameConfig;
         if (!cfg) return;
 
@@ -259,6 +285,9 @@ class App {
         }
 
         const options = this.buildGameOptions(cfg.id);
+        if (cfg.hasStages) {
+            options.stage = stageNum;
+        }
         this.activeGameInstance = new GameClass(container, options);
         this.activeGameInstance.loadCSS(cfg.cssPath);
 
@@ -417,24 +446,6 @@ class App {
     }
 
     handleGameWin(gameId, score, timeSec, moves, extra) {
-        let iq = 100;
-        if (gameId === 'merge') {
-            iq = this.calcMergeIQ(timeSec, moves).iq;
-        } else if (gameId === 'king') {
-            // Nexus Align 難易度別評価モデル (extra = difficulty)
-            const difficulty = extra || 'normal';
-            if (difficulty === 'easy') {
-                iq = Math.max(60, Math.min(115, 100 + Math.round((60 - timeSec) / 2) - moves * 3));
-            } else if (difficulty === 'hard') {
-                iq = Math.max(80, Math.min(145, 130 + Math.round((300 - timeSec) / 6) - moves * 5));
-            } else if (difficulty === 'expert') {
-                iq = Math.max(90, Math.min(160, 145 + Math.round((720 - timeSec) / 12) - moves * 6));
-            } else {
-                iq = Math.max(70, Math.min(130, 115 + Math.round((150 - timeSec) / 4) - moves * 4));
-            }
-        }
-
-        const percent = this.iqToPercentile(iq);
         const cp = Math.round(score * 0.3);
         this.points += cp;
         localStorage.setItem('logiq_points', this.points);
@@ -487,24 +498,14 @@ class App {
             this.highScores[gameId] = score;
             localStorage.setItem(this.currentGameConfig.scoreKey, score);
         }
-        if (!this.highestIQs[gameId] || iq > parseInt(this.highestIQs[gameId])) {
-            this.highestIQs[gameId] = String(iq);
-            localStorage.setItem(this.currentGameConfig.iqKey, iq);
-        }
-
-        let evaluation = '素晴らしい論理的思考力です。';
-        if (iq >= 130) evaluation = '極めて優れた論理構築能力を示しています。';
-        else if (iq >= 115) evaluation = '平均を大きく上回る高い知性を発揮しています。';
+        let evaluation = '素晴らしいプレイでした！';
 
         this.showResultView({
             badge: 'MEASUREMENT COMPLETE',
             header: '測定結果',
-            iqLabel: this.currentGameConfig.iqLabel,
             timeLabel: 'クリア時間',
             movesLabel: gameId === 'merge' ? '総手数' : '操作回数',
             showEfficiency: gameId === 'merge',
-            iq,
-            percent,
             score,
             time: this.formatTime(timeSec),
             moves: `${moves}回`,
@@ -520,21 +521,7 @@ class App {
         if (saveKey) localStorage.removeItem(saveKey);
     }
 
-    calcMergeIQ(timeSec, moves) {
-        const iq = Math.max(70, Math.min(155, 140 - Math.floor(timeSec / 12) - Math.floor(moves / 15)));
-        return { iq };
-    }
 
-    iqToPercentile(iq) {
-        if (iq >= 150) return "99.9%";
-        if (iq >= 140) return "99.6%";
-        if (iq >= 130) return "97.7%";
-        if (iq >= 120) return "90.8%";
-        if (iq >= 115) return "84.1%";
-        if (iq >= 110) return "74.7%";
-        if (iq >= 100) return "50.0%";
-        return "25.0%以下";
-    }
 
     handleGameOver(gameId, score) {
         const saveKey = gameId === 'merge' ? 'logiq_save_game' : gameId === 'king' ? 'logiq_save_king_game' : null;
